@@ -1366,6 +1366,13 @@ window.APP_CONFIG = {
     ZFOOD: "https://script.google.com/macros/s/AKfycbzVdHeD20QG6_gZmm23TdNgBIEdVSOkiBwxoIWy-Nmt9a_3GTJUWcHCcuDkQb-MxmCygw/exec"
   }
 };
+
+// Prefix cache otomatis mengikuti Firebase projectId.
+// Jika projectId diganti saat membuat web baru, cache ikut terpisah.
+window.APP_CACHE_PREFIX = String(window.APP_CONFIG.FIREBASE.projectId || "default")
+  .trim()
+  .replace(/[^a-zA-Z0-9_-]/g, "_")
+  .toUpperCase();
 </script>
 <script type="module">  
   
@@ -1445,10 +1452,10 @@ let historyUnsubscribe=null;
 let historyFirebaseReady=false;  
   
 const MASTER_CACHE_KEY=  
-  "TB_MASTER_DATA_V2";  
+  "TB_" + window.APP_CACHE_PREFIX + "_MASTER_DATA_V2";  
   
 const HISTORY_CACHE_PREFIX=  
-  "TB_HISTORY_V2_";  
+  "TB_" + window.APP_CACHE_PREFIX + "_HISTORY_V2_";  
   
 const HISTORY_LIMIT=  
   40;  
@@ -7322,8 +7329,8 @@ const APPS_SCRIPT_URL = '__ZFOOD_API_URL__';
 let MASTER_DATA = [];
 let masterLoaded = false;
 
-const MASTER_CACHE_KEY = 'ZFOOD_MASTER_CACHE_V2';
-const MASTER_CACHE_TIME_KEY = 'ZFOOD_MASTER_CACHE_TIME_V2';
+const MASTER_CACHE_KEY = `ZFOOD_${window.APP_CACHE_PREFIX}_MASTER_CACHE_V2`;
+const MASTER_CACHE_TIME_KEY = `ZFOOD_${window.APP_CACHE_PREFIX}_MASTER_CACHE_TIME_V2`;
 const MASTER_CACHE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 jam
 
 
