@@ -11717,7 +11717,7 @@ body&gt;.app .sup,body&gt;.app .date{color:#7d8692!important;}
 &lt;script&gt;
 const API_URL='__INCOMING_API_URL__';
 
-let suppliers=[],products=[],n=0,editId=null,incomingType='HALAL',historyType='HALAL',data=[];
+let suppliers=[],products=[],n=0,editId=null,editTarget=null,incomingType='HALAL',historyType='HALAL',data=[];
 const referenceCache={};
 const referenceLoading={};
 
@@ -11727,7 +11727,7 @@ function page(id){
   scrollTo(0,0);
   if(id==='history')render();
 }
-function newForm(){editId=null;reset();page('typeGate')}
+function newForm(){editId=null;editTarget=null;reset();page('typeGate')}
 function selectIncomingType(type){
   incomingType=type;
   updateIncomingTypeInfo(type);
@@ -12086,12 +12086,19 @@ async function save(){
       action:isEdit?'update':'save',id:editId||'',category:x.category,tanggal:x.tanggal,noPo:x.noPo,vendor:x.vendor,
       suhuMobil:x.suhuMobil,kebersihanMobil:x.kebersihanMobil,
       products:x.products.map(p=&gt;({nama:p.nama,qty:p.qty,suhu:p.suhu,kualitas:x.kualitasProduk,tindakanKoreksi:x.tindakanKoreksi,keputusan:x.keputusan})),
-      pic:x.pic
+      pic:x.pic,
+      spreadsheetId:isEdit?(editTarget?.spreadsheetId||''):'',
+      sheet:isEdit?(editTarget?.sheet||''):'',
+      startRow:isEdit?(editTarget?.startRow||0):0,
+      endRow:isEdit?(editTarget?.endRow||0):0,
+      separatorRow:isEdit?(editTarget?.separatorRow||0):0,
+      indexRow:isEdit?(editTarget?.indexRow||0):0
     });
 
     if(!result.success)throw new Error(result.message||'Data gagal disimpan');
 
     editId=result.id||result.data?.id||editId||null;
+    editTarget=null;
     invalidateHistoryDateCache(x.category);
 
     // Success animation
@@ -12241,7 +12248,9 @@ function normalizeHistory(result){
     car:x.suhuMobil??x.car??'',clean:x.kebersihanMobil??x.clean??'',
     quality:x.kualitasProduk??x.quality??'',corr:x.tindakanKoreksi??x.corr??'',
     decision:x.keputusan??x.decision??'',pic:x.pic??'',block:x.block??0,sheet:x.sheet??'',
-    startRow:x.startRow??0,products:Array.isArray(x.products)?x.products:[]
+    startRow:x.startRow??0,endRow:x.endRow??0,separatorRow:x.separatorRow??0,
+    spreadsheetId:x.spreadsheetId??'',indexRow:x.indexRow??0,
+    products:Array.isArray(x.products)?x.products:[]
   }));
 }
 function renderHistoryUI(){
@@ -12376,7 +12385,7 @@ function toInputDate(value){
 
 async function edit(id){
   const x=data.find(a=&gt;String(a.id)===String(id));if(!x)return;
-  editId=x.id;incomingType=x.halal||historyType;page('form');reset();incomingType=x.halal||historyType;updateIncomingTypeInfo(incomingType);
+  editId=x.id;incomingType=x.halal||historyType;page('form');reset();editTarget=x;incomingType=x.halal||historyType;updateIncomingTypeInfo(incomingType);
   document.getElementById('date').value=
   toInputDate(
     document.getElementById('hd').value || x.date
