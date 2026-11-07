@@ -1581,6 +1581,13 @@ button
 {
   display:flex
 }
+#dataBsdPage{position:fixed}
+.bsd-loading-overlay{position:absolute;inset:64px 0 0;z-index:30;display:none;align-items:center;justify-content:center;flex-direction:column;gap:13px;background:rgba(5,9,15,.82);backdrop-filter:blur(7px)}
+.bsd-loading-overlay.show{display:flex}
+.bsd-loading-spinner{width:42px;height:42px;border:3px solid rgba(255,255,255,.13);border-top-color:#39b7ff;border-right-color:#35e8c0;border-radius:50%;animation:bsdSpin .75s linear infinite;box-shadow:0 0 24px rgba(0,170,255,.18)}
+.bsd-loading-title{font-size:12px;font-weight:900;letter-spacing:.8px;color:#fff}
+.bsd-loading-sub{font-size:10px;color:rgba(255,255,255,.48)}
+@keyframes bsdSpin{to{transform:rotate(360deg)}}
 .data-bsd-topbar
 {
   flex:none;
@@ -6759,6 +6766,11 @@ body
 </div>
 </div>
 <section id="dataBsdPage">
+<div id="bsdLoadingOverlay" class="bsd-loading-overlay" aria-live="polite">
+<div class="bsd-loading-spinner"></div>
+<div class="bsd-loading-title">SEDANG MEMUAT DATA BSD</div>
+<div class="bsd-loading-sub">Mohon tunggu, data sedang diproses...</div>
+</div>
 <div class="data-bsd-topbar">
 <div class="data-bsd-brand">
 <div class="data-bsd-logo"> TB </div>
@@ -6930,13 +6942,31 @@ body
 <span id="settingsRole" class="profile-value" > - </span>
 </div>
 </div>
-<button class="btn btn-secondary" onclick="resetOwnPassword()" > KIRIM RESET PASSWORD </button>
+<button class="btn btn-secondary" onclick="openResetPasswordConfirm()" > KIRIM RESET PASSWORD </button>
 <div id="adminSection" class="admin-section hidden" >
 <h3> USER MENUNGGU PERSETUJUAN </h3>
 <div id="pendingList" class="pending-list" >
 <div class="history-empty"> Tidak ada user pending </div>
 </div>
 </div>
+</div>
+</div>
+<div id="resetPasswordConfirmModal" class="modal">
+<div class="modal-card">
+<div class="modal-head">
+<h2>Konfirmasi Reset Password</h2>
+<button class="modal-close" onclick="closeModal('resetPasswordConfirmModal')">×</button>
+</div>
+<div class="profile-box">
+<div style="font-size:12px;font-weight:900;margin-bottom:8px;">Apakah Anda yakin ingin reset password?</div>
+<div style="font-size:10px;line-height:1.6;color:#9299a4;">Link untuk membuat password baru akan dikirim ke alamat email berikut:</div>
+<div id="resetPasswordTargetEmail" style="margin-top:10px;padding:10px;border-radius:10px;background:rgba(255,122,0,.09);border:1px solid rgba(255,122,0,.2);color:#ffb347;font-size:12px;font-weight:900;overflow-wrap:anywhere;">-</div>
+</div>
+<div style="display:flex;gap:9px;">
+<button id="cancelResetPasswordBtn" class="btn btn-secondary" style="flex:1;" onclick="closeModal('resetPasswordConfirmModal')">BATAL</button>
+<button id="confirmResetPasswordBtn" class="btn btn-primary" style="flex:1;" onclick="confirmResetOwnPassword()">YA, RESET PASSWORD</button>
+</div>
+<div id="resetPasswordConfirmMessage" class="message"></div>
 </div>
 </div>
 <div id="toastContainer">
@@ -7932,37 +7962,64 @@ window.openSettings=function(){
    RESET PASSWORD  
 ===================================================== */  
   
-window.resetOwnPassword=  
-async function(){  
-  
-  if(!currentUser)  
-    return;  
-  
-  try{  
-  
-    await sendPasswordResetEmail(  
-      auth,  
-      currentUser.email  
-    );  
-  
-    showToast(  
-      "Link reset password dikirim.",  
-      "success"  
-    );  
-  
-  }catch(error){  
-  
-    showToast(  
-      firebaseErrorMessage(  
-        error  
-      ),  
-      "error"  
-    );  
-  
-  }  
-  
-};  
-  
+window.openResetPasswordConfirm=
+function(){
+
+  if(!currentUser || !currentUser.email){
+    showToast("Email akun tidak ditemukan.","error");
+    return;
+  }
+
+  $("resetPasswordTargetEmail").textContent=currentUser.email;
+  $("resetPasswordConfirmMessage").textContent="";
+  $("resetPasswordConfirmMessage").className="message";
+
+  const button=$("confirmResetPasswordBtn");
+  button.disabled=false;
+  button.textContent="YA, RESET PASSWORD";
+
+  openModal("resetPasswordConfirmModal");
+};
+
+window.confirmResetOwnPassword=
+async function(){
+
+  if(!currentUser || !currentUser.email)
+    return;
+
+  const button=$("confirmResetPasswordBtn");
+  const cancel=$("cancelResetPasswordBtn");
+
+  button.disabled=true;
+  cancel.disabled=true;
+  button.innerHTML=`<span class="history-spinner"></span> MENGIRIM...`;
+
+  try{
+
+    await sendPasswordResetEmail(auth,currentUser.email);
+    closeModal("resetPasswordConfirmModal");
+
+    showToast(
+      "Link reset password berhasil dikirim ke "+currentUser.email,
+      "success"
+    );
+
+  }catch(error){
+
+    const message=$("resetPasswordConfirmMessage");
+    message.className="message error";
+    message.textContent=firebaseErrorMessage(error);
+
+  }finally{
+
+    button.disabled=false;
+    cancel.disabled=false;
+    button.textContent="YA, RESET PASSWORD";
+
+  }
+
+};
+
 /* =====================================================  
    PENDING  
 ===================================================== */  
@@ -9912,6 +9969,10 @@ async function deleteHistoryItem(index){
     renderHistory();
     showToast("Gagal menghapus data.","error");
   }
+  finally{
+    if(loadingOverlay) loadingOverlay.classList.remove("show");
+  }
+
 }
 
 /* =====================================================
@@ -10187,6 +10248,9 @@ async function bsdLoadAll(){
   const body=  
     $("bsdTableBody");  
   
+  const loadingOverlay=$("bsdLoadingOverlay");
+  if(loadingOverlay) loadingOverlay.classList.add("show");
+
   body.innerHTML=  
     `<tr>  
       <td colspan="8" class="bsd-empty">  
@@ -10252,10 +10316,15 @@ async function bsdLoadAll(){
         </td>  
       </tr>`;  
   
-  }  
-  
+  }finally{
+
+    if(loadingOverlay)
+      loadingOverlay.classList.remove("show");
+
+  }
+
 }  
-  
+
 /* =====================================================  
    BSD DISPLAY  
 ===================================================== */  
@@ -17523,7 +17592,14 @@ body&gt;.app .sup,body&gt;.app .date{color:#7d8692!important;}
 &lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"&gt;&lt;path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2"/&gt;&lt;path d="M8 8h8v8H8z"/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;div class="results" id="supplierResults"&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/section&gt;&lt;section class="section"&gt;&lt;div class="st"&gt;&lt;b&gt;PEMERIKSAAN MOBIL&lt;/b&gt;&lt;small&gt;PENGIRIMAN&lt;/small&gt;&lt;/div&gt;&lt;div class="row"&gt;&lt;div class="field"&gt;&lt;label&gt;SUHU MOBIL (°C)&lt;/label&gt;&lt;input id="car" type="text" autocomplete="off" placeholder="Masukan Suhu Mobil" oninput="this.value=this.value.replace(/[^0-9,.-]/g,\'\').replace(/(?!^)-/g,\'\')"&gt;&lt;/div&gt;&lt;div class="field"&gt;&lt;label&gt;KEBERSIHAN MOBIL&lt;/label&gt;&lt;select id="clean" onchange="onCleanChange()"&gt;&lt;option value=""&gt;Pilih&lt;/option&gt;&lt;option&gt;OK&lt;/option&gt;&lt;option&gt;TIDAK&lt;/option&gt;&lt;option&gt;MOTOR&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;&lt;/div&gt;&lt;/section&gt;&lt;section class="section"&gt;&lt;div class="st"&gt;&lt;b&gt;PRODUK&lt;/b&gt;&lt;small id="count"&gt;0 / 4&lt;/small&gt;&lt;/div&gt;&lt;div id="products"&gt;&lt;/div&gt;&lt;button class="add" id="add" onclick="addProduct()"&gt;＋ TAMBAH PRODUK&lt;/button&gt;&lt;/section&gt;&lt;section class="section"&gt;&lt;div class="st"&gt;&lt;b&gt;HASIL PEMERIKSAAN PO&lt;/b&gt;&lt;small&gt;PO LEVEL&lt;/small&gt;&lt;/div&gt;&lt;div class="field"&gt;&lt;label&gt;KUALITAS PRODUK&lt;/label&gt;&lt;select id="quality"&gt;
 &lt;option value="OK" selected&gt;OK&lt;/option&gt;
 &lt;option value="TIDAK"&gt;TIDAK&lt;/option&gt;
-&lt;/select&gt;&lt;/div&gt;&lt;div class="field"&gt;&lt;label&gt;TINDAKAN KOREKSI&lt;/label&gt;&lt;select id="corr" onchange="document.getElementById('manual').style.display=this.value==='MANUAL'?'block':'none'"&gt;&lt;option value=""&gt;Tidak ada / pilih&lt;/option&gt;&lt;option&gt;PAKAI STEREFOAM + ES&lt;/option&gt;&lt;option value="MANUAL"&gt;LAINNYA / KETIK SENDIRI&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;&lt;div class="field" id="manual" style="display:none"&gt;&lt;label&gt;KETERANGAN TINDAKAN KOREKSI&lt;/label&gt;&lt;textarea id="corrText" placeholder="Tulis tindakan koreksi..."&gt;&lt;/textarea&gt;&lt;/div&gt;&lt;div class="row"&gt;&lt;div class="field"&gt;&lt;label&gt;KEPUTUSAN&lt;/label&gt;&lt;select id="decision"&gt;&lt;option value=""&gt;Pilih&lt;/option&gt;&lt;option&gt;DITERIMA&lt;/option&gt;&lt;option&gt;DITOLAK&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;&lt;div class="field"&gt;&lt;label&gt;PIC&lt;/label&gt;&lt;select id="pic" onchange="toggleOtherPic()"&gt;&lt;option value=""&gt;Pilih PIC&lt;/option&gt;&lt;option&gt;MAMAT&lt;/option&gt;&lt;option&gt;ISA&lt;/option&gt;&lt;option&gt;EFENDI&lt;option value="OTHER"&gt;ISI NAMA LAIN&lt;/option&gt;&lt;/select&gt;&lt;div id="picOtherWrap" style="display:none"&gt;
+&lt;/select&gt;&lt;/div&gt;&lt;div class="field"&gt;&lt;label&gt;TINDAKAN KOREKSI&lt;/label&gt;&lt;select id="corr" onchange="document.getElementById('manual').style.display=this.value==='MANUAL'?'block':'none'"&gt;&lt;option value=""&gt;Tidak ada / pilih&lt;/option&gt;&lt;option&gt;PAKAI STEREFOAM + ES&lt;/option&gt;&lt;option value="MANUAL"&gt;LAINNYA / KETIK SENDIRI&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;&lt;div class="field" id="manual" style="display:none"&gt;&lt;label&gt;KETERANGAN TINDAKAN KOREKSI&lt;/label&gt;&lt;textarea id="corrText" placeholder="Tulis tindakan koreksi..."&gt;&lt;/textarea&gt;&lt;/div&gt;&lt;div class="row"&gt;&lt;div class="field"&gt;&lt;label&gt;KEPUTUSAN&lt;/label&gt;&lt;select id="decision"&gt;&lt;option value=""&gt;Pilih&lt;/option&gt;&lt;option&gt;DITERIMA&lt;/option&gt;&lt;option&gt;DITOLAK&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;&lt;div class="field"&gt;&lt;label&gt;
+    PIC&lt;/label&gt;&lt;select id="pic" onchange="toggleOtherPic()"&gt;&lt;option value=""&gt;Pilih PIC&lt;
+  /option&gt;&lt;option&gt;MAMAT&lt;
+  /option&gt;&lt;option&gt;ISA&lt;
+  /option&gt;&lt;option&gt;EFENDI&lt;
+  /option&gt;&lt;option&gt;ALDI&lt;
+  option value="OTHER"&gt;ISI NAMA LAIN&lt;
+  /option&gt;&lt;/select&gt;&lt;div id="picOtherWrap" style="display:none"&gt;
 &lt;input id="picOther" type="text" inputmode="text" placeholder="Ketik nama PIC..." autocomplete="off"&gt;
 &lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/section&gt;&lt;button class="primary" onclick="save()"&gt;SIMPAN INCOMING&lt;/button&gt;&lt;/main&gt;&lt;main id="history" class="page"&gt;&lt;div class="hero"&gt;&lt;div class="ey"&gt;INCOMING HISTORY&lt;/div&gt;&lt;h2&gt;Riwayat&lt;/h2&gt;&lt;p&gt;Riwayat dikelompokkan berdasarkan tanggal, lembar / halaman setiap PO&lt;/p&gt;&lt;button class="back" onclick="page('home')"&gt;‹ Kembali&lt;/button&gt;&lt;/div&gt;&lt;section class="section"&gt;
 &lt;div class="field"&gt;&lt;label&gt;KATEGORI&lt;/label&gt;
