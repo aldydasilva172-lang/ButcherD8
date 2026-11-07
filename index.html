@@ -1582,9 +1582,33 @@ button
   display:flex
 }
 #dataBsdPage{position:fixed}
-.bsd-loading-overlay{position:absolute;inset:64px 0 0;z-index:30;display:none;align-items:center;justify-content:center;flex-direction:column;gap:13px;background:rgba(5,9,15,.82);backdrop-filter:blur(7px)}
+.bsd-loading-overlay{
+  position:absolute;
+  inset:64px 0 0;
+  z-index:30;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:13px;
+  background:rgba(255,255,255,.035);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+
 .bsd-loading-overlay.show{display:flex}
-.bsd-loading-spinner{width:42px;height:42px;border:3px solid rgba(255,255,255,.13);border-top-color:#39b7ff;border-right-color:#35e8c0;border-radius:50%;animation:bsdSpin .75s linear infinite;box-shadow:0 0 24px rgba(0,170,255,.18)}
+
+.bsd-loading-spinner{
+  width:42px;
+  height:42px;
+  border:3px solid rgba(255,122,0,.16);
+  border-top-color:#ff7a00;
+  border-right-color:#ffb347;
+  border-radius:50%;
+  animation:bsdSpin .75s linear infinite;
+  box-shadow:0 0 24px rgba(255,122,0,.25);
+}
+  
 .bsd-loading-title{font-size:12px;font-weight:900;letter-spacing:.8px;color:#fff}
 .bsd-loading-sub{font-size:10px;color:rgba(255,255,255,.48)}
 @keyframes bsdSpin{to{transform:rotate(360deg)}}
