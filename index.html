@@ -17635,10 +17635,10 @@ body&gt;.app .sup,body&gt;.app .date{color:#7d8692!important;}
 &lt;option value="OK" selected&gt;OK&lt;/option&gt;
 &lt;option value="TIDAK"&gt;TIDAK&lt;/option&gt;
 &lt;/select&gt;&lt;/div&gt;&lt;div class="field"&gt;&lt;label&gt;TINDAKAN KOREKSI&lt;/label&gt;&lt;select id="corr" onchange="document.getElementById('manual').style.display=this.value==='MANUAL'?'block':'none'"&gt;&lt;option value=""&gt;Tidak ada / pilih&lt;/option&gt;&lt;option&gt;PAKAI STEREFOAM + ES&lt;/option&gt;&lt;option value="MANUAL"&gt;LAINNYA / KETIK SENDIRI&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;&lt;div class="field" id="manual" style="display:none"&gt;&lt;label&gt;KETERANGAN TINDAKAN KOREKSI&lt;/label&gt;&lt;textarea id="corrText" placeholder="Tulis tindakan koreksi..."&gt;&lt;/textarea&gt;&lt;/div&gt;&lt;div class="row"&gt;&lt;div class="field"&gt;&lt;label&gt;KEPUTUSAN&lt;/label&gt;&lt;select id="decision"&gt;&lt;option value=""&gt;Pilih&lt;/option&gt;&lt;option&gt;DITERIMA&lt;/option&gt;&lt;option&gt;DITOLAK&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;&lt;div class="field"&gt;&lt;label&gt;PIC&lt;/label&gt;&lt;select id="pic" onchange="toggleOtherPic()"&gt;&lt;option value=""&gt;Pilih PIC
-  &lt;/option&gt;&lt;option&gt;MAMAT
+  &lt;/option&gt;&lt;option&gt;MAMAD
   &lt;/option&gt;&lt;option&gt;ISA
   &lt;/option&gt;&lt;option&gt;EFENDI
-  &lt;/option&gt;&lt;option&gt;ALDI
+  &lt;/option&gt;&lt;option&gt;FARHAN
   &lt;option value="OTHER"&gt;ISI NAMA LAIN
   &lt;/option&gt;&lt;/select&gt;&lt;div id="picOtherWrap" style="display:none"&gt;
 &lt;input id="picOther" type="text" inputmode="text" placeholder="Ketik nama PIC..." autocomplete="off"&gt;
@@ -18359,7 +18359,7 @@ async function edit(id){
   document.getElementById('decision').value=x.decision;
   const picSelect=document.getElementById('pic');
   const picOther=document.getElementById('picOther');
-  const picKnown=['MAMAT','ISA','EFENDI'];
+  const picKnown=['MAMAT','ISA','EFENDI','FARHAN'];
   if(picKnown.includes(String(x.pic||'').toUpperCase())){
     picSelect.value=String(x.pic).toUpperCase();
     picOther.value='';
