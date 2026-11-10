@@ -13281,11 +13281,8 @@ const APPS_SCRIPT_URL = '__ZFOOD_API_URL__';
 ========================================================= */
 
 let MASTER_DATA = [];
+let MASTER_SEARCH_DATA = [];
 let masterLoaded = false;
-
-const MASTER_CACHE_KEY = `ZFOOD_${window.APP_CACHE_PREFIX}_MASTER_CACHE_V2`;
-const MASTER_CACHE_TIME_KEY = `ZFOOD_${window.APP_CACHE_PREFIX}_MASTER_CACHE_TIME_V2`;
-const MASTER_CACHE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 jam
 
 
 /* =========================================================
@@ -13306,224 +13303,97 @@ let pendingTransactionKey = '';
 
 function loadMaster(){
 
-  /*
-    CACHE-FIRST:
-    1. Coba gunakan MASTER dari localStorage.
-    2. Kalau ada, langsung aktifkan aplikasi tanpa menunggu server.
-    3. Tetap refresh MASTER di background agar data tetap terbaru.
-    4. Kalau belum ada cache, baru tampilkan status loading.
-  */
+  // MASTER Z-FOOD selalu diminta langsung dari API.
+  // Tidak membaca atau menyimpan MASTER ke Local Storage.
+  masterLoaded = false;
+  MASTER_DATA = [];
+  MASTER_SEARCH_DATA = [];
 
-  let hasCache = false;
-
-  try{
-
-    const cached = localStorage.getItem(MASTER_CACHE_KEY);
-    const cachedTime = Number(
-      localStorage.getItem(MASTER_CACHE_TIME_KEY) || 0
-    );
-
-    if(cached){
-
-      const parsed = JSON.parse(cached);
-
-      if(
-        Array.isArray(parsed) &amp;&amp;
-        parsed.length &gt; 0
-      ){
-
-        MASTER_DATA = parsed;
-        masterLoaded = true;
-        hasCache = true;
-
-        setMasterStatus(
-          'MASTER DATA SIAP • ' +
-          MASTER_DATA.length +
-          ' data',
-          'ready'
-        );
-
-        ensureInitialProducts();
-      }
-
-    }
-
-  }catch(error){
-
-    console.warn(
-      'Cache MASTER tidak dapat digunakan:',
-      error
-    );
-
-  }
-
-
-  /*
-    Kalau belum ada cache:
-    tampilkan loading.
-    Kalau sudah ada cache:
-    jangan blokir user.
-  */
-
-  if(!hasCache){
-
-    setMasterStatus(
-      'Memuat MASTER...',
-      'loading'
-    );
-
-  }
-
-
-  /*
-    Ambil MASTER terbaru di background.
-  */
+  setMasterStatus('Memuat MASTER dari Spreadsheet...', 'loading');
 
   const callbackName =
-    'zfoodMaster_' +
-    Date.now() +
-    '_' +
+    'zfoodMaster_' + Date.now() + '_' +
     Math.floor(Math.random() * 10000);
 
+  let finished = false;
+  const script = document.createElement('script');
+  script.async = true;
 
-  window[callbackName] =
-    function(response){
+  function finish(){
+    if(finished) return;
+    finished = true;
+    cleanupJSONP(callbackName);
+    if(script.parentNode) script.parentNode.removeChild(script);
+  }
 
-      try{
-
-        if(
-          response &amp;&amp;
-          response.success &amp;&amp;
-          Array.isArray(response.data)
-        ){
-
-          MASTER_DATA =
-            response.data;
-
-          masterLoaded = true;
-
-
-          /*
-            Simpan MASTER terbaru secara permanen
-            di browser.
-          */
-
-          try{
-
-            localStorage.setItem(
-              MASTER_CACHE_KEY,
-              JSON.stringify(MASTER_DATA)
-            );
-
-            localStorage.setItem(
-              MASTER_CACHE_TIME_KEY,
-              String(Date.now())
-            );
-
-          }catch(cacheError){
-
-            console.warn(
-              'Gagal menyimpan cache MASTER:',
-              cacheError
-            );
-
-          }
-
-
-          setMasterStatus(
-            'MASTER DATA SIAP • ' +
-            MASTER_DATA.length +
-            ' data',
-            'ready'
-          );
-
-
-          ensureInitialProducts();
-
-
-        }else{
-
-          /*
-            Kalau server gagal tetapi cache ada,
-            jangan ganggu user.
-          */
-
-          if(!hasCache){
-
-            throw new Error(
-              response &amp;&amp; response.error
-                ? response.error
-                : 'Data MASTER tidak valid.'
-            );
-
-          }
-
-        }
-
-
-      }catch(error){
-
-        console.error(error);
-
-        if(!hasCache){
-
-          setMasterStatus(
-            'Gagal memuat MASTER',
-            'error'
-          );
-
-        }
-
+  window[callbackName] = function(response){
+    try{
+      if(
+        !response ||
+        response.success !== true ||
+        !Array.isArray(response.data)
+      ){
+        throw new Error(
+          response && response.error
+            ? response.error
+            : 'Data MASTER tidak valid.'
+        );
       }
 
+      MASTER_DATA = response.data;
 
-      cleanupJSONP(callbackName);
+      // Siapkan teks pencarian sekali saat data diterima,
+      // bukan mengubah huruf dan memecah nama pada setiap ketikan.
+      MASTER_SEARCH_DATA = MASTER_DATA.map(function(item){
+        const nama = String(item.nama || '').trim().toLowerCase();
+        return {
+          item: item,
+          artikel: String(item.artikel || '').trim().toLowerCase(),
+          barcode: String(item.barcode || '').trim().toLowerCase(),
+          nama: nama,
+          namaWords: nama ? nama.split(/\s+/) : []
+        };
+      });
 
-    };
+      masterLoaded = true;
 
+      setMasterStatus(
+        'MASTER DATA SIAP • ' + MASTER_DATA.length + ' data',
+        'ready'
+      );
 
-  const script =
-    document.createElement('script');
+      ensureInitialProducts();
+
+      console.info(
+        '[Z-FOOD] MASTER berhasil dimuat:',
+        MASTER_DATA.length,
+        'produk'
+      );
+
+    }catch(error){
+      console.error('[Z-FOOD] Gagal memproses MASTER:', error);
+      masterLoaded = false;
+      setMasterStatus('Gagal memuat MASTER: ' + error.message, 'error');
+
+    }finally{
+      finish();
+    }
+  };
+
+  script.onerror = function(){
+    masterLoaded = false;
+    setMasterStatus('Gagal terhubung ke API MASTER', 'error');
+    finish();
+  };
 
   script.src =
     APPS_SCRIPT_URL +
-    '?callback=' +
-    encodeURIComponent(callbackName) +
-    '&amp;_=' +
-    Date.now();
-
-
-  script.onerror =
-    function(){
-
-      /*
-        Jika cache tersedia, aplikasi tetap berjalan.
-        Error server tidak membuat MASTER menjadi blank.
-      */
-
-      if(!hasCache){
-
-        setMasterStatus(
-          'Gagal terhubung ke MASTER',
-          'error'
-        );
-
-      }
-
-      cleanupJSONP(callbackName);
-
-    };
-
+    '?callback=' + encodeURIComponent(callbackName) +
+    '&_=' + Date.now();
 
   document.body.appendChild(script);
-
 }
 
-
-/*
-  Pastikan produk awal dan akhir hanya dibuat
-  sekali setelah MASTER tersedia.
-*/
 
 function ensureInitialProducts(){
 
@@ -13903,153 +13773,51 @@ function renumberProducts(type){
 function searchProduct(input){
 
   if(!masterLoaded){
-
     return;
-
   }
 
+  const product = input.closest('.product');
+  if(!product) return;
 
-  const product =
-    input.closest('.product');
+  const dropdown = product.querySelector('.dropdown');
+  const keyword = String(input.value || '').trim().toLowerCase();
 
-
-  if(!product){
-
+  if(keyword === ''){
+    dropdown.classList.remove('show');
     return;
-
   }
 
+  const searchParts = keyword
+    .split(/\s+/)
+    .map(function(part){ return part.replace(/\*/g, '').trim(); })
+    .filter(Boolean);
 
-  const dropdown =
-    product.querySelector(
-      '.dropdown'
-    );
+  const results = [];
 
+  // Loop biasa lebih ringan daripada filter + membuat ulang string
+  // untuk setiap produk. Berhenti segera setelah 30 hasil ditemukan.
+  for(let i = 0; i < MASTER_SEARCH_DATA.length; i++){
+    const row = MASTER_SEARCH_DATA[i];
 
-  const keyword =
-    String(
-      input.value || ''
-    )
-      .trim()
-      .toLowerCase();
+    const namaMatch =
+      searchParts.length > 0 &&
+      searchParts.every(function(part, index){
+        return row.namaWords[index] &&
+          row.namaWords[index].startsWith(part);
+      });
 
-
-  /*
-    Kalau kosong,
-    tampilkan maksimal 30 MASTER pertama.
-  */
-
-  let results;
-
-
-if(keyword === ''){
-
-  dropdown.classList.remove('show');
-  return;
-
-}else{
-
-  results =
-    MASTER_DATA.filter(
-          
-      function(item){
-
-          const article =
-            String(
-              item.artikel || ''
-            ).toLowerCase();
-
-          const barcode =
-            String(
-              item.barcode || ''
-            ).toLowerCase();
-
-          const nama =
-            String(
-              item.nama || ''
-            ).toLowerCase();
-
-
-          /*
-            PENCARIAN NAMA BARANG FLEXIBLE
-
-            Contoh MASTER:
-            CHICKEN BLACK PEPPER RTC
-
-            Ketik:
-            C BL P
-
-            Maka:
-            C  -&gt; CHICKEN
-            BL -&gt; BLACK
-            P  -&gt; PEPPER
-
-            Kata tambahan seperti RTC tetap boleh ada.
-          */
-
-          const searchParts =
-            keyword
-              .split(/\s+/)
-              .map(function(part){
-                return part
-                  .replace(/\*/g, '')
-                  .trim();
-              })
-              .filter(Boolean);
-
-          const namaWords =
-            nama
-              .split(/\s+/)
-              .filter(Boolean);
-
-          const namaMatch =
-            searchParts.length &gt; 0 &amp;&amp;
-            searchParts.every(
-              function(part, index){
-
-                const partLower =
-                  part.toLowerCase();
-
-                /*
-                  Kata harus berurutan.
-                  Contoh:
-                  C BL P
-                  CH BL PEP
-                  C* BL* P*
-                */
-
-                return (
-                  namaWords[index] &amp;&amp;
-                  namaWords[index]
-                    .toLowerCase()
-                    .startsWith(partLower)
-                );
-
-              }
-            );
-
-          return (
-            article.includes(keyword) ||
-            barcode.includes(keyword) ||
-            nama.includes(keyword) ||
-            namaMatch
-          );
-
-        }
-      ).slice(
-        0,
-        30
-      );
-
+    if(
+      row.artikel.includes(keyword) ||
+      row.barcode.includes(keyword) ||
+      row.nama.includes(keyword) ||
+      namaMatch
+    ){
+      results.push(row.item);
+      if(results.length >= 30) break;
+    }
   }
 
-
-  renderDropdown(
-    dropdown,
-    results,
-    input
-  );
-
+  renderDropdown(dropdown, results, input);
 }
 
 
