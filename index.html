@@ -6651,7 +6651,7 @@ body
 <label>PASSWORD</label>
 <div class="password-wrapper">
 <input id="loginPassword" class="input" type="password" autocomplete="current-password" placeholder="Masukkan password" >
-<button type="button" class="password-toggle" onclick="togglePassword('loginPassword',this)" aria-label="Tampilkan password" aria-pressed="false">👁</button>
+<button type="button" class="password-toggle" onclick="togglePassword('loginPassword',this)" aria-label="Tampilkan password" aria-pressed="false">🐵</button>
 </div>
 </div>
 <button id="loginButton" class="btn btn-primary" onclick="login()" > LOGIN </button>
@@ -6951,14 +6951,14 @@ body
 <label> PASSWORD </label>
 <div class="password-wrapper">
 <input id="signupPassword" class="input" type="password" placeholder="Minimal 6 karakter" >
-<button type="button" class="password-toggle" onclick="togglePassword('signupPassword',this)" aria-label="Tampilkan password" aria-pressed="false">👁</button>
+<button type="button" class="password-toggle" onclick="togglePassword('signupPassword',this)" aria-label="Tampilkan password" aria-pressed="false">🐵</button>
 </div>
 </div>
 <div class="input-group">
 <label> KONFIRMASI PASSWORD </label>
 <div class="password-wrapper">
 <input id="signupConfirm" class="input" type="password" placeholder="Ulangi password" >
-<button type="button" class="password-toggle" onclick="togglePassword('signupConfirm',this)" aria-label="Tampilkan password" aria-pressed="false">👁</button>
+<button type="button" class="password-toggle" onclick="togglePassword('signupConfirm',this)" aria-label="Tampilkan password" aria-pressed="false">🐵</button>
 </div>
 </div>
 <button class="btn btn-primary" onclick="signup()" > DAFTAR </button>
@@ -18562,7 +18562,7 @@ function togglePassword(id,button){
 
   const showing=input.type==="password";
   input.type=showing?"text":"password";
-  button.textContent=showing?"🙈":"👁";
+  button.textContent=showing?"🙈":"🐵";
   button.setAttribute("aria-pressed",showing?"true":"false");
   button.setAttribute(
     "aria-label",
