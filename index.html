@@ -6592,6 +6592,7 @@ body
   }
 }</style>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://unpkg.com/@zxing/library@latest"></script>
 </head>
 <body>
 <section id="loginPage">
@@ -11158,92 +11159,158 @@ console.log(
    INVENTORY BARCODE CAMERA SCANNER
    Shared by STOCK LOSS and STOCK OPNAME
 ===================================================== */
-let inventoryScannerInstance=null;
+let inventoryScannerReader=null;
+let inventoryScannerControls=null;
 let inventoryScannerBusy=false;
 
 async function openInventoryScanner(){
   const modal=document.getElementById("inventoryScannerModal");
   const status=document.getElementById("inventoryScannerStatus");
-  if(!modal||!status)return;
+  const readerBox=document.getElementById("inventoryScannerReader");
+  if(!modal||!status||!readerBox)return;
+
   modal.classList.add("on");
   modal.setAttribute("aria-hidden","false");
-  status.textContent="Arahkan barcode ke kamera";
-  if(inventoryScannerInstance){
+  status.textContent="Menyiapkan kamera...";
+
+  if(inventoryScannerReader||inventoryScannerControls){
     await closeInventoryScanner(false);
     modal.classList.add("on");
     modal.setAttribute("aria-hidden","false");
   }
-  if(typeof Html5Qrcode==="undefined"){
-    status.textContent="Scanner belum tersedia. Silakan masukkan barcode secara manual.";
+
+  if(typeof ZXing==="undefined"||!ZXing.BrowserMultiFormatReader){
+    status.textContent="Library ZXing belum tersedia. Silakan input barcode manual.";
     return;
   }
+
   inventoryScannerBusy=false;
-  inventoryScannerInstance=new Html5Qrcode("inventoryScannerReader");
+  readerBox.innerHTML="";
+  const video=document.createElement("video");
+  video.setAttribute("playsinline","true");
+  video.setAttribute("autoplay","true");
+  video.setAttribute("muted","true");
+  video.muted=true;
+  video.style.cssText="width:100%;height:100%;object-fit:cover;display:block;";
+  readerBox.appendChild(video);
+
   try{
-    const formats=typeof Html5QrcodeSupportedFormats!=="undefined"?[
-      Html5QrcodeSupportedFormats.CODE_128,Html5QrcodeSupportedFormats.CODE_39,
-      Html5QrcodeSupportedFormats.CODE_93,Html5QrcodeSupportedFormats.EAN_13,
-      Html5QrcodeSupportedFormats.EAN_8,Html5QrcodeSupportedFormats.UPC_A,
-      Html5QrcodeSupportedFormats.UPC_E,Html5QrcodeSupportedFormats.ITF,
-      Html5QrcodeSupportedFormats.QR_CODE
-    ]:undefined;
-    const config={fps:15,qrbox:{width:280,height:140},aspectRatio:2,disableFlip:true};
-    if(formats)config.formatsToSupport=formats;
-    await inventoryScannerInstance.start({facingMode:"environment"},config,async decodedText=>{
-      if(inventoryScannerBusy)return;
-      inventoryScannerBusy=true;
-      const input=document.getElementById("barcode");
-      if(input){
-        input.value=String(decodedText||"").trim();
-        input.dispatchEvent(new Event("input",{bubbles:true}));
-        input.focus();
-      }
-      status.textContent="Barcode berhasil dibaca";
-      setTimeout(()=>closeInventoryScanner(),180);
-    },()=>{});
-    setTimeout(async()=>{
-      try{
-        const video=document.querySelector("#inventoryScannerReader video");
-        const track=video?.srcObject?.getVideoTracks?.()[0];
-        const caps=track?.getCapabilities?.()||{};
-        const advanced={};
-        if(Array.isArray(caps.focusMode)&&caps.focusMode.includes("continuous"))advanced.focusMode="continuous";
-        if(caps.zoom){
-          const min=Number(caps.zoom.min||1),max=Number(caps.zoom.max||min);
-          if(max>min)advanced.zoom=Math.min(max,min+(max-min)*0.15);
+    const hints=new Map();
+    const formats=[
+      ZXing.BarcodeFormat.CODE_128,
+      ZXing.BarcodeFormat.CODE_39,
+      ZXing.BarcodeFormat.CODE_93,
+      ZXing.BarcodeFormat.EAN_13,
+      ZXing.BarcodeFormat.EAN_8,
+      ZXing.BarcodeFormat.UPC_A,
+      ZXing.BarcodeFormat.UPC_E,
+      ZXing.BarcodeFormat.ITF,
+      ZXing.BarcodeFormat.QR_CODE
+    ].filter(Boolean);
+
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,formats);
+    hints.set(ZXing.DecodeHintType.TRY_HARDER,true);
+
+    inventoryScannerReader=new ZXing.BrowserMultiFormatReader(hints,250);
+    status.textContent="Arahkan barcode ke kamera";
+
+    inventoryScannerControls=await inventoryScannerReader.decodeFromVideoDevice(
+      undefined,
+      video,
+      async(result,error)=>{
+        if(!result||inventoryScannerBusy)return;
+
+        inventoryScannerBusy=true;
+        const decodedText=String(result.getText()||"").trim();
+        const input=document.getElementById("barcode");
+
+        if(input){
+          input.value=decodedText;
+          input.dispatchEvent(new Event("input",{bubbles:true}));
+          input.focus();
         }
-        if(Object.keys(advanced).length)await track.applyConstraints({advanced:[advanced]});
-      }catch(e){}
-    },300);
+
+        status.textContent="Barcode berhasil dibaca";
+        setTimeout(()=>closeInventoryScanner(),180);
+      }
+    );
+
+    // Terapkan fokus otomatis dan zoom setelah kamera aktif.
+    const applyInventoryCameraSettings=async()=>{
+      try{
+        const track=video.srcObject?.getVideoTracks?.()[0];
+        if(!track)return;
+
+        const caps=track.getCapabilities?.()||{};
+        const advanced={};
+
+        if(Array.isArray(caps.focusMode)&&caps.focusMode.includes("continuous")){
+          advanced.focusMode="continuous";
+        }
+
+        if(caps.zoom){
+          const min=Number(caps.zoom.min??1);
+          const max=Number(caps.zoom.max??min);
+          const target=Math.min(max,Math.max(min,2.0));
+          if(target>min)advanced.zoom=target;
+        }
+
+        if(Object.keys(advanced).length){
+          await track.applyConstraints({advanced:[advanced]});
+        }
+      }catch(err){
+        console.log("Pengaturan kamera Inventory tidak didukung:",err);
+      }
+    };
+
+    // Beri waktu browser memasang stream video terlebih dahulu.
+    setTimeout(applyInventoryCameraSettings,700);
+
   }catch(err){
-    console.error("Inventory scanner error:",err);
-    status.textContent="Kamera tidak dapat dibuka. Izinkan akses kamera atau gunakan input manual.";
-    try{await inventoryScannerInstance.clear();}catch(e){}
-    inventoryScannerInstance=null;
+    console.error("ZXing Inventory scanner error:",err);
+    status.textContent="Kamera tidak dapat dibuka. Izinkan akses kamera atau input barcode manual.";
+    try{inventoryScannerControls?.stop();}catch(e){}
+    try{inventoryScannerReader?.reset();}catch(e){}
+    inventoryScannerControls=null;
+    inventoryScannerReader=null;
   }
 }
 
 async function closeInventoryScanner(hide=true){
   const modal=document.getElementById("inventoryScannerModal");
-  const reader=document.getElementById("inventoryScannerReader");
+  const readerBox=document.getElementById("inventoryScannerReader");
+
   if(hide&&modal){
     modal.classList.remove("on");
     modal.setAttribute("aria-hidden","true");
   }
-  if(inventoryScannerInstance){
-    try{if(inventoryScannerInstance.isScanning)await inventoryScannerInstance.stop();}catch(e){}
-    try{await inventoryScannerInstance.clear();}catch(e){}
-    inventoryScannerInstance=null;
-  }
+
+  try{
+    if(inventoryScannerControls){
+      inventoryScannerControls.stop();
+    }
+  }catch(e){}
+
+  try{
+    if(inventoryScannerReader){
+      inventoryScannerReader.reset();
+    }
+  }catch(e){}
+
+  inventoryScannerControls=null;
+  inventoryScannerReader=null;
   inventoryScannerBusy=false;
-  if(reader)reader.innerHTML="";
+
+  if(readerBox)readerBox.innerHTML="";
 }
 
 window.openInventoryScanner=openInventoryScanner;
 window.closeInventoryScanner=closeInventoryScanner;
 
 document.addEventListener("keydown",event=>{
-  if(event.key==="Escape"&&document.getElementById("inventoryScannerModal")?.classList.contains("on"))closeInventoryScanner();
+  if(event.key==="Escape"&&document.getElementById("inventoryScannerModal")?.classList.contains("on")){
+    closeInventoryScanner();
+  }
 });</script>
 <style id="THE-BUTCHER-ANDROID-OLD-PDT-SIDEBAR-FIX">/* =========================================================
    ANDROID LAMA / PDT — SIDEBAR SCROLL FIX
