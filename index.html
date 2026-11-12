@@ -11210,7 +11210,7 @@ async function openInventoryScanner(){
         if(Array.isArray(caps.focusMode)&&caps.focusMode.includes("continuous"))advanced.focusMode="continuous";
         if(caps.zoom){
           const min=Number(caps.zoom.min||1),max=Number(caps.zoom.max||min);
-          if(max>min)advanced.zoom=Math.min(max,min+(max-min)*0.350);
+          if(max>min)advanced.zoom=Math.min(max,min+(max-min)*0.210);
         }
         if(Object.keys(advanced).length)await track.applyConstraints({advanced:[advanced]});
       }catch(e){}
@@ -18260,7 +18260,7 @@ async function tuneScannerCamera(){
     if(caps.focusMode &amp;&amp; Array.isArray(caps.focusMode) &amp;&amp; caps.focusMode.includes('continuous')) advanced.focusMode='continuous';
     if(caps.zoom){
       const min=Number(caps.zoom.min||1), max=Number(caps.zoom.max||min);
-      const target=Math.min(max,Math.max(min,min+(max-min)*0.350));
+      const target=Math.min(max,Math.max(min,min+(max-min)*0.210));
       if(target&gt;min)advanced.zoom=target;
     }
     if(Object.keys(advanced).length){try{await track.applyConstraints({advanced:[advanced]});}catch(e){}}
