@@ -6592,6 +6592,46 @@ body
   }
 }</style>
 <script src="https://unpkg.com/@zxing/library@latest"></script>
+
+<style id="password-eye-style">
+.password-wrapper{
+  position:relative;
+  width:100%;
+}
+.password-wrapper .input{
+  width:100%;
+  padding-right:48px!important;
+}
+.password-toggle{
+  position:absolute;
+  right:9px;
+  top:50%;
+  transform:translateY(-50%);
+  width:34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  color:#aeb4bf;
+  font-size:17px;
+  line-height:1;
+  cursor:pointer;
+  z-index:2;
+  -webkit-tap-highlight-color:transparent;
+}
+.password-toggle:hover,
+.password-toggle:focus-visible{
+  color:var(--orange2);
+  background:rgba(255,122,0,.09);
+  outline:none;
+}
+.password-toggle:active{
+  transform:translateY(-50%) scale(.94);
+}
+</style>
 </head>
 <body>
 <section id="loginPage">
@@ -6609,7 +6649,10 @@ body
 </div>
 <div class="input-group">
 <label>PASSWORD</label>
+<div class="password-wrapper">
 <input id="loginPassword" class="input" type="password" autocomplete="current-password" placeholder="Masukkan password" >
+<button type="button" class="password-toggle" onclick="togglePassword('loginPassword',this)" aria-label="Tampilkan password" aria-pressed="false">👁</button>
+</div>
 </div>
 <button id="loginButton" class="btn btn-primary" onclick="login()" > LOGIN </button>
 <div class="login-actions">
@@ -6906,11 +6949,17 @@ body
 </div>
 <div class="input-group">
 <label> PASSWORD </label>
+<div class="password-wrapper">
 <input id="signupPassword" class="input" type="password" placeholder="Minimal 6 karakter" >
+<button type="button" class="password-toggle" onclick="togglePassword('signupPassword',this)" aria-label="Tampilkan password" aria-pressed="false">👁</button>
+</div>
 </div>
 <div class="input-group">
 <label> KONFIRMASI PASSWORD </label>
+<div class="password-wrapper">
 <input id="signupConfirm" class="input" type="password" placeholder="Ulangi password" >
+<button type="button" class="password-toggle" onclick="togglePassword('signupConfirm',this)" aria-label="Tampilkan password" aria-pressed="false">👁</button>
+</div>
 </div>
 <button class="btn btn-primary" onclick="signup()" > DAFTAR </button>
 <div id="signupMessage" class="message" >
@@ -18505,4 +18554,20 @@ function closeIncoming(){
   document.getElementById("dashboard")?.classList.remove("hidden");
   updateOnlineStatus?.();
 }</script>
+
+<script id="password-eye-script">
+function togglePassword(id,button){
+  const input=document.getElementById(id);
+  if(!input || !button) return;
+
+  const showing=input.type==="password";
+  input.type=showing?"text":"password";
+  button.textContent=showing?"🙈":"👁";
+  button.setAttribute("aria-pressed",showing?"true":"false");
+  button.setAttribute(
+    "aria-label",
+    showing?"Sembunyikan password":"Tampilkan password"
+  );
+}
+</script>
 </body></html>
