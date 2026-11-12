@@ -12886,12 +12886,26 @@ input{
 .zfood-scan-field{position:relative;width:100%}
 .zfood-scan-field .search-input{padding-right:52px!important}
 .zfood-scan-btn{
-  position:absolute;right:5px;top:1px;width:36px;height:36px;
-  border:0;border-radius:8px;background:#f7f8fa;color:#4b5563;
-  display:grid;place-items:center;padding:0;cursor:pointer;z-index:5;
-  box-shadow:0 1px 3px rgba(0,0,0,.08)
+  position:absolute;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  width:42px;
+  height:42px;
+  border:0;
+  border-radius:10px;
+  background:#f7f8fa;
+  color:#4b5563;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2;
+  box-shadow:0 1px 4px rgba(0,0,0,.08)
 }
-.zfood-scan-btn:active{transform:scale(.95)}
+.zfood-scan-btn:active{
+  transform:translateY(-50%) scale(.95)
+}
 .zfood-scan-btn svg{width:19px;height:19px;display:block}
 #zfoodScannerModal{
   position:fixed;inset:0;z-index:100000;display:none;
