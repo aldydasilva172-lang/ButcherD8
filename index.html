@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>BUTCHER D8</title><style>:root
+<title>BUTCHER DISTRIC 8</title><style>:root
 {
   --orange:#ff7a00;
   --orange2:#ffb347;
@@ -12962,6 +12962,29 @@ input{
   .zfood-scanner-card{padding:12px}
   #zfoodScannerReader{width:100%;height:170px}
 }
+
+#zfoodPage .zfood-qty-row{display:flex;gap:7px;align-items:center}
+#zfoodPage .zfood-qty-row .quantity-input{flex:1;min-width:0}
+#zfoodPage .zfood-calc-open{width:46px;height:45px;flex:none;border:0;border-radius:11px;background:#fff1e5;color:#ed7100;font-size:23px;font-weight:900;box-shadow:0 2px 7px rgba(0,0,0,.08)}
+#zfoodCalculatorModal{position:fixed;inset:0;z-index:100010;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,20,28,.48)}
+#zfoodCalculatorModal.on{display:flex}
+#zfoodCalculatorModal .zcalc-card{width:min(100%,330px);padding:16px;border-radius:20px;background:#fff;color:#202938;box-shadow:0 24px 70px rgba(0,0,0,.28)}
+#zfoodCalculatorModal .zcalc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+#zfoodCalculatorModal .zcalc-head strong{font-size:13px;font-weight:900}
+#zfoodCalculatorModal .zcalc-head button{border:0;background:#f1f3f5;border-radius:9px;width:34px;height:34px;font-size:21px;color:#475467}
+#zfoodCalculatorModal .zcalc-hint{font-size:10px;color:#667085;margin:0 0 9px}
+#zfoodCalculatorModal .zcalc-display{width:100%;height:52px;padding:0 13px;border:1px solid #e1e5eb;border-radius:12px;text-align:right;font-size:22px;font-weight:800;color:#17202a;background:#f8fafc;outline:none;white-space:nowrap;overflow-x:auto}
+#zfoodCalculatorModal .zcalc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
+#zfoodCalculatorModal .zcalc-key{height:48px;border:0;border-radius:11px;background:#f1f3f6;color:#202938;font-size:18px;font-weight:800}
+#zfoodCalculatorModal .zcalc-key.op{background:#fff0e3;color:#e66d00}
+#zfoodCalculatorModal .zcalc-key.eq{background:#ff7a00;color:white}
+#zfoodCalculatorModal .zcalc-actions{display:flex;gap:8px;margin-top:11px}
+#zfoodCalculatorModal .zcalc-actions button{height:43px;flex:1;border:0;border-radius:11px;font-size:11px;font-weight:900}
+#zfoodCalculatorModal .zcalc-min{background:#eef1f5;color:#475467}
+#zfoodCalculatorModal .zcalc-apply{background:#ff7a00;color:#fff}
+#zfoodCalcRestore{position:fixed;right:16px;bottom:22px;z-index:100011;display:none;padding:12px 16px;border:0;border-radius:999px;background:#ff7a00;color:#fff;font-size:12px;font-weight:900;box-shadow:0 8px 25px rgba(0,0,0,.25)}
+#zfoodCalcRestore.on{display:block}
+
 &lt;/style&gt;
 
 &lt;/head&gt;
@@ -12984,9 +13007,9 @@ input{
 &lt;div id="dashboardPage" class="dashboard"&gt;
   &lt;div class="dashboard-shell"&gt;
     &lt;div class="dashboard-top"&gt;
-      &lt;div class="dashboard-badge"&gt;Z-FOOD SYSTEM&lt;/div&gt;
+      &lt;div class="dashboard-badge"&gt;FORM Z-FOOD BSD&lt;/div&gt;
       &lt;h1 class="dashboard-title"&gt;Z-&lt;span&gt;FOOD&lt;/span&gt;&lt;/h1&gt;
-      &lt;p class="dashboard-subtitle"&gt;Form Z-Food BSD&lt;/p&gt;
+      &lt;p class="dashboard-subtitle"&gt;RANCH MARKET D8&lt;/p&gt;
     &lt;/div&gt;
 
     &lt;div class="dashboard-grid"&gt;
@@ -13452,29 +13475,7 @@ input{
   &lt;/div&gt;
 &lt;/div&gt;
 
-&lt;style&gt;
-#zfoodPage .zfood-qty-row{display:flex;gap:7px;align-items:center}
-#zfoodPage .zfood-qty-row .quantity-input{flex:1;min-width:0}
-#zfoodPage .zfood-calc-open{width:46px;height:45px;flex:none;border:0;border-radius:11px;background:#fff1e5;color:#ed7100;font-size:23px;font-weight:900;box-shadow:0 2px 7px rgba(0,0,0,.08)}
-#zfoodCalculatorModal{position:fixed;inset:0;z-index:100010;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,20,28,.48)}
-#zfoodCalculatorModal.on{display:flex}
-#zfoodCalculatorModal .zcalc-card{width:min(100%,330px);padding:16px;border-radius:20px;background:#fff;color:#202938;box-shadow:0 24px 70px rgba(0,0,0,.28)}
-#zfoodCalculatorModal .zcalc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
-#zfoodCalculatorModal .zcalc-head strong{font-size:13px;font-weight:900}
-#zfoodCalculatorModal .zcalc-head button{border:0;background:#f1f3f5;border-radius:9px;width:34px;height:34px;font-size:21px;color:#475467}
-#zfoodCalculatorModal .zcalc-hint{font-size:10px;color:#667085;margin:0 0 9px}
-#zfoodCalculatorModal .zcalc-display{width:100%;height:52px;padding:0 13px;border:1px solid #e1e5eb;border-radius:12px;text-align:right;font-size:24px;font-weight:800;color:#17202a;background:#f8fafc;outline:none}
-#zfoodCalculatorModal .zcalc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
-#zfoodCalculatorModal .zcalc-key{height:48px;border:0;border-radius:11px;background:#f1f3f6;color:#202938;font-size:18px;font-weight:800}
-#zfoodCalculatorModal .zcalc-key.op{background:#fff0e3;color:#e66d00}
-#zfoodCalculatorModal .zcalc-key.eq{background:#ff7a00;color:white}
-#zfoodCalculatorModal .zcalc-actions{display:flex;gap:8px;margin-top:11px}
-#zfoodCalculatorModal .zcalc-actions button{height:43px;flex:1;border:0;border-radius:11px;font-size:11px;font-weight:900}
-#zfoodCalculatorModal .zcalc-min{background:#eef1f5;color:#475467}
-#zfoodCalculatorModal .zcalc-apply{background:#ff7a00;color:#fff}
-#zfoodCalcRestore{position:fixed;right:16px;bottom:22px;z-index:100011;display:none;padding:12px 16px;border:0;border-radius:999px;background:#ff7a00;color:#fff;font-size:12px;font-weight:900;box-shadow:0 8px 25px rgba(0,0,0,.25)}
-#zfoodCalcRestore.on{display:block}
-&lt;/style&gt;
+&lt;script src="https://unpkg.com/@zxing/library@latest"&gt;&lt;/script&gt;
 
 &lt;div id="zfoodCalculatorModal" aria-hidden="true"&gt;
   &lt;div class="zcalc-card"&gt;
@@ -13483,7 +13484,7 @@ input{
       &lt;button type="button" onclick="closeZfoodCalculator()" aria-label="Tutup"&gt;×&lt;/button&gt;
     &lt;/div&gt;
     &lt;div class="zcalc-hint" id="zcalcHint"&gt;Nilai awal mengambil total Qty dari bagian seberang. Angka tetap bisa diedit.&lt;/div&gt;
-    &lt;input id="zcalcDisplay" class="zcalc-display" type="text" inputmode="text" autocomplete="off" spellcheck="false" value="0"&gt;
+    &lt;input id="zcalcDisplay" class="zcalc-display" type="text" inputmode="decimal" autocomplete="off" value="0"&gt;
     &lt;div class="zcalc-grid"&gt;
       &lt;button class="zcalc-key op" onclick="zcalcPress('C')"&gt;C&lt;/button&gt;
       &lt;button class="zcalc-key op" onclick="zcalcPress('DEL')"&gt;⌫&lt;/button&gt;
@@ -13535,68 +13536,8 @@ input{
 
 
 /* =========================================================
-   Z-FOOD BARCODE SCANNER - ZXing
-   Dipakai untuk setiap produk di PRODUK AWAL dan PRODUK AKHIR.
+   Z-FOOD POPUP CALCULATOR
 ========================================================= */
-let zfoodScannerReader=null;
-let zfoodScannerControls=null;
-let zfoodScannerTarget=null;
-let zfoodScannerBusy=false;
-
-function handleZfoodScannedCode(raw,target){
-  const value=String(raw||'').trim();
-  if(!target)return;
-  const product=target.closest('.product');
-  if(!product)return;
-
-  let article=value;
-  let scannedQty=null;
-
-  // Barcode timbang: 13 digit, prefix 20.
-  // Digit 3-7 = article, digit 8-12 = berat dalam gram.
-  if(/^20\d{11}$/.test(value)){
-    article=value.substring(2,7);
-    const grams=parseInt(value.substring(7,12),10);
-    if(Number.isFinite(grams)){
-      scannedQty=grams/1000;
-    }
-  }
-
-  const key=String(article).trim().toLowerCase();
-  let match=null;
-
-  if(Array.isArray(MASTER_DATA)){
-    match=MASTER_DATA.find(item=>
-      String(item.artikel||'').trim().toLowerCase()===key
-    )||null;
-
-    // Barcode biasa: cocokkan barcode MASTER secara persis.
-    if(!match && scannedQty===null){
-      match=MASTER_DATA.find(item=>
-        String(item.barcode||'').trim().toLowerCase()===value.toLowerCase()
-      )||null;
-    }
-  }
-
-  target.value=article;
-  if(match){
-    selectProduct(target,match);
-    if(scannedQty!==null){
-      const qtyInput=product.querySelector('.quantity-input');
-      const formatted=scannedQty.toFixed(3).replace(/\.?0+$/,'').replace('.',',');
-      if(qtyInput){
-        qtyInput.value=formatted;
-        updateQuantity(qtyInput);
-      }
-    }
-  }else{
-    target.dispatchEvent(new Event('input',{bubbles:true}));
-    if(scannedQty!==null){
-      product.dataset.pendingScanQty=String(scannedQty);
-    }
-  }
-}
-
 let zfoodCalcTarget=null;
 let zfoodCalcLastValue='0';
 
@@ -13645,7 +13586,9 @@ function minimizeZfoodCalculator(){
 function restoreZfoodCalculator(){
   document.getElementById('zfoodCalcRestore').classList.remove('on');
   document.getElementById('zfoodCalculatorModal').classList.add('on');
-  document.getElementById('zfoodCalculatorModal').setAttribute('aria-hiddlet zcalcStoredValue=null;
+  document.getElementById('zfoodCalculatorModal').setAttribute('aria-hidden','false');
+}
+let zcalcStoredValue=null;
 let zcalcPendingOperator=null;
 let zcalcWaitingForValue=false;
 
@@ -13833,9 +13776,6 @@ function applyZfoodCalculator(){
   closeZfoodCalculator();
 }
 
-alculator();
-}
-
 async function openZfoodScanner(button){
   const field=button ? button.closest('.zfood-scan-field') : null;
   const input=field ? field.querySelector('.search-input') : null;
@@ -13899,7 +13839,8 @@ async function openZfoodScanner(button){
         const decodedText=String(result.getText()||'').trim();
         const target=zfoodScannerTarget;
         if(target){
-          handleZfoodScannedCode(decodedText,target);
+          target.value=decodedText;
+          target.dispatchEvent(new Event('input',{bubbles:true}));
           target.focus();
         }
         status.textContent='Barcode berhasil dibaca';
@@ -14064,87 +14005,13 @@ let pendingTransactionKey = '';
    LOAD MASTER
 ========================================================= */
 
-/* =========================================================
-   MASTER CACHE — LOCAL DEVICE
-========================================================= */
-const ZFOOD_MASTER_CACHE_KEY = 'D8_ZFOOD_MASTER_CACHE_V1';
-const ZFOOD_MASTER_CACHE_TIME_KEY = 'D8_ZFOOD_MASTER_CACHE_TIME_V1';
-
-function buildMasterSearchIndex(data){
-  return (Array.isArray(data) ? data : []).map(function(item){
-    const nama = String(item.nama || '').trim().toLowerCase();
-    return {
-      item: item,
-      artikel: String(item.artikel || '').trim().toLowerCase(),
-      barcode: String(item.barcode || '').trim().toLowerCase(),
-      nama: nama,
-      namaWords: nama ? nama.split(/\s+/) : []
-    };
-  });
-}
-
-function applyMasterData(data, source){
-  if(!Array.isArray(data) || !data.length){
-    throw new Error('Data MASTER kosong atau tidak valid.');
-  }
-
-  MASTER_DATA = data;
-  MASTER_SEARCH_DATA = buildMasterSearchIndex(data);
-  masterLoaded = true;
-  ensureInitialProducts();
-
-  console.info(
-    '[Z-FOOD] MASTER siap:',
-    MASTER_DATA.length,
-    'produk (' + source + ')'
-  );
-}
-
-function readZfoodMasterCache(){
-  try{
-    const raw = localStorage.getItem(ZFOOD_MASTER_CACHE_KEY);
-    if(!raw) return false;
-
-    const data = JSON.parse(raw);
-    if(!Array.isArray(data) || !data.length) return false;
-
-    applyMasterData(data, 'cache lokal');
-    return true;
-  }catch(error){
-    console.warn('[Z-FOOD] Cache MASTER tidak dapat dibaca:', error);
-    return false;
-  }
-}
-
-function saveZfoodMasterCache(data){
-  try{
-    localStorage.setItem(ZFOOD_MASTER_CACHE_KEY, JSON.stringify(data));
-    localStorage.setItem(ZFOOD_MASTER_CACHE_TIME_KEY, String(Date.now()));
-  }catch(error){
-    console.warn('[Z-FOOD] Gagal menyimpan cache MASTER:', error);
-  }
-}
-
-/* =========================================================
-   LOAD MASTER — CACHE FIRST, UPDATE IN BACKGROUND
-========================================================= */
 function loadMaster(){
 
-  // Cache langsung dipakai agar form tidak perlu menunggu server.
-  // Jika MASTER sudah tersedia di memori, jangan proses cache ulang.
-  let hasLocalData = masterLoaded && MASTER_DATA.length > 0;
-  if(!hasLocalData){
-    hasLocalData = readZfoodMasterCache();
-  }
+  masterLoaded = false;
+  MASTER_DATA = [];
+  MASTER_SEARCH_DATA = [];
 
-  if(hasLocalData){
-    setMasterStatus('', 'ready');
-  }else{
-    masterLoaded = false;
-    MASTER_DATA = [];
-    MASTER_SEARCH_DATA = [];
-    setMasterStatus('Sedang mengambil data produk dari MASTER...', 'loading');
-  }
+  setMasterStatus('Sedang mengambil data produk dari MASTER...', 'loading');
 
   const callbackName =
     'zfoodMaster_' + Date.now() + '_' +
@@ -14162,21 +14029,10 @@ function loadMaster(){
     if(script.parentNode) script.parentNode.removeChild(script);
   }
 
-  function handleLoadError(message){
-    if(hasLocalData){
-      // Cache valid: tetap gunakan data lokal jika server sedang offline.
-      masterLoaded = true;
-      setMasterStatus('', 'ready');
-      console.warn('[Z-FOOD] Update MASTER gagal; memakai cache lokal:', message);
-    }else{
-      masterLoaded = false;
-      setMasterStatus(message, 'error');
-    }
-  }
-
   const timeoutId = setTimeout(function(){
     if(finished) return;
-    handleLoadError('Waktu tunggu habis saat membaca MASTER. Periksa koneksi lalu coba lagi.');
+    masterLoaded = false;
+    setMasterStatus('Waktu tunggu habis saat membaca MASTER. Periksa koneksi lalu coba lagi.', 'error');
     finish();
   }, 30000);
 
@@ -14187,23 +14043,44 @@ function loadMaster(){
       if(
         !response ||
         response.success !== true ||
-        !Array.isArray(response.data) ||
-        !response.data.length
+        !Array.isArray(response.data)
       ){
         throw new Error(
           response && response.error
             ? response.error
-            : 'Data MASTER tidak valid atau kosong.'
+            : 'Data MASTER tidak valid.'
         );
       }
 
-      applyMasterData(response.data, 'server terbaru');
-      saveZfoodMasterCache(response.data);
+      MASTER_DATA = response.data;
+
+      MASTER_SEARCH_DATA = MASTER_DATA.map(function(item){
+        const nama = String(item.nama || '').trim().toLowerCase();
+        return {
+          item: item,
+          artikel: String(item.artikel || '').trim().toLowerCase(),
+          barcode: String(item.barcode || '').trim().toLowerCase(),
+          nama: nama,
+          namaWords: nama ? nama.split(/\s+/) : []
+        };
+      });
+
+      masterLoaded = true;
+      ensureInitialProducts();
+
+      console.info(
+        '[Z-FOOD] MASTER berhasil dimuat:',
+        MASTER_DATA.length,
+        'produk'
+      );
+
+      // Tutup layar loading dan langsung tampilkan halaman Z-FOOD.
       setMasterStatus('', 'ready');
 
     }catch(error){
       console.error('[Z-FOOD] Gagal memproses MASTER:', error);
-      handleLoadError('Gagal memuat MASTER: ' + error.message);
+      masterLoaded = false;
+      setMasterStatus('Gagal memuat MASTER: ' + error.message, 'error');
 
     }finally{
       finish();
@@ -14212,7 +14089,8 @@ function loadMaster(){
 
   script.onerror = function(){
     if(finished) return;
-    handleLoadError('Gagal terhubung ke API MASTER. Periksa koneksi lalu coba lagi.');
+    masterLoaded = false;
+    setMasterStatus('Gagal terhubung ke API MASTER. Periksa koneksi lalu coba lagi.', 'error');
     finish();
   };
 
@@ -14491,7 +14369,8 @@ function addProduct(type,options){
           autocomplete="off"
           oninput="updateQuantity(this)"
         &gt;
-        &lt;button type="button" class="zfood-calc-open" onclick="openZfoodCalculator(this)" title="Buka kalkulator"&gt;⌗&lt;/button&gt;
+        &lt;button type="button" class="zfood-calc-open"
+          onclick="openZfoodCalculator(this)" aria-label="Buka kalkulator" title="Kalkulator Qty"&gt;⌗&lt;/button&gt;
       &lt;/div&gt;
 
     &lt;/div&gt;
@@ -14602,6 +14481,28 @@ function renumberProducts(type){
 
 
 /* =========================================================
+   Z-FOOD WEIGHED BARCODE (KHUSUS FORM Z-FOOD)
+   Format: 20 + 5 digit article + 5 digit gram + 1 digit check
+========================================================= */
+function parseZfoodWeighedBarcode(value){
+  const code = String(value || '').trim();
+
+  if(!/^20\d{11}$/.test(code)) return null;
+
+  const article = code.substring(2, 7);
+  const gramsText = code.substring(7, 12);
+  const grams = Number(gramsText);
+
+  if(!Number.isFinite(grams)) return null;
+
+  return {
+    article: article,
+    qty: (grams / 1000).toFixed(3).replace('.', ',')
+  };
+}
+
+
+/* =========================================================
    SEARCH PRODUCT
 ========================================================= */
 
@@ -14615,6 +14516,15 @@ function searchProduct(input){
   if(!product) return;
 
   const dropdown = product.querySelector('.dropdown');
+
+  // Jika hasil scan berupa barcode timbang 13 digit (diawali 20),
+  // ubah menjadi ARTICLE dan simpan Qty untuk diisikan saat produk dipilih.
+  const weighed = parseZfoodWeighedBarcode(input.value);
+  if(weighed){
+    input.value = weighed.article;
+    product.dataset.pendingWeighedQty = weighed.qty;
+  }
+
   const keyword = String(input.value || '').trim().toLowerCase();
 
   if(keyword === ''){
@@ -14847,6 +14757,18 @@ function selectProduct(
   input.value =
     item.artikel || '';
 
+  // Qty hasil barcode timbang baru diterapkan setelah user
+  // memilih produk yang benar dari daftar MASTER.
+  const pendingQty = product.dataset.pendingWeighedQty || '';
+  if(pendingQty){
+    const quantityInput = product.querySelector('.quantity-input');
+    if(quantityInput){
+      quantityInput.value = pendingQty;
+      product.dataset.quantity = pendingQty;
+    }
+    delete product.dataset.pendingWeighedQty;
+  }
+
 
   const dropdown =
     product.querySelector(
@@ -14862,16 +14784,6 @@ function selectProduct(
   updateDataTable(
     product.dataset.type
   );
-
-  if(product.dataset.pendingScanQty){
-    const pending=parseFloat(product.dataset.pendingScanQty);
-    const qtyInput=product.querySelector('.quantity-input');
-    if(qtyInput && Number.isFinite(pending)){
-      qtyInput.value=zfoodFormatCalc(pending);
-      updateQuantity(qtyInput);
-    }
-    delete product.dataset.pendingScanQty;
-  }
 
 }
 
@@ -18198,7 +18110,7 @@ body&gt;.app .sup,body&gt;.app .date{color:#7d8692!important;}
 }
 &lt;/style&gt;
 &lt;/head&gt;&lt;body&gt;&lt;script src="https://unpkg.com/@zxing/library@latest"&gt;&lt;/script&gt;
-&lt;div class="app"&gt;&lt;header class="top"&gt;&lt;div class="brand"&gt;&lt;div class="logo"&gt;📝&lt;/div&gt;&lt;div&gt;&lt;b&gt;INCOMING&lt;/b&gt;&lt;small&gt;RANCH MARKET KEMANG&lt;/small&gt;&lt;/div&gt;&lt;/div&gt;&lt;button class="icon" onclick="page('home')"&gt;⌂&lt;/button&gt;&lt;/header&gt;&lt;main id="home" class="page on"&gt;&lt;div class="hero"&gt;&lt;div class="ey"&gt;INCOMING CONTROL&lt;/div&gt;&lt;h2&gt;FORM INCOMING&lt;/h2&gt;&lt;p&gt;BSD RM D8&lt;/p&gt;&lt;/div&gt;&lt;div class="grid"&gt;&lt;button class="menu" onclick="newForm()"&gt;&lt;div class="ico"&gt;＋&lt;/div&gt;&lt;b&gt;Incoming Baru&lt;/b&gt;&lt;span&gt;Input penerimaan&lt;/span&gt;&lt;/button&gt;&lt;button class="menu" onclick="page('history');render()"&gt;&lt;div class="ico"&gt;≡&lt;/div&gt;&lt;b&gt;Riwayat&lt;/b&gt;&lt;span&gt;Per lembar / PO&lt;/span&gt;&lt;/button&gt;&lt;button class="menu" onclick="openSpreadsheetMenu()"&gt;&lt;div class="ico"&gt;▥&lt;/div&gt;&lt;b&gt;Spreadsheet&lt;/b&gt;&lt;span&gt;Buka file bulanan&lt;/span&gt;&lt;/button&gt;&lt;/div&gt;&lt;/main&gt;
+&lt;div class="app"&gt;&lt;header class="top"&gt;&lt;div class="brand"&gt;&lt;div class="logo"&gt;📝&lt;/div&gt;&lt;div&gt;&lt;b&gt;INCOMING&lt;/b&gt;&lt;small&gt;RANCH MARKET D8&lt;/small&gt;&lt;/div&gt;&lt;/div&gt;&lt;button class="icon" onclick="page('home')"&gt;⌂&lt;/button&gt;&lt;/header&gt;&lt;main id="home" class="page on"&gt;&lt;div class="hero"&gt;&lt;div class="ey"&gt;INCOMING CONTROL&lt;/div&gt;&lt;h2&gt;FORM INCOMING&lt;/h2&gt;&lt;p&gt;BSD RM D8&lt;/p&gt;&lt;/div&gt;&lt;div class="grid"&gt;&lt;button class="menu" onclick="newForm()"&gt;&lt;div class="ico"&gt;＋&lt;/div&gt;&lt;b&gt;Incoming Baru&lt;/b&gt;&lt;span&gt;Input penerimaan&lt;/span&gt;&lt;/button&gt;&lt;button class="menu" onclick="page('history');render()"&gt;&lt;div class="ico"&gt;≡&lt;/div&gt;&lt;b&gt;Riwayat&lt;/b&gt;&lt;span&gt;Per lembar / PO&lt;/span&gt;&lt;/button&gt;&lt;button class="menu" onclick="openSpreadsheetMenu()"&gt;&lt;div class="ico"&gt;▥&lt;/div&gt;&lt;b&gt;Spreadsheet&lt;/b&gt;&lt;span&gt;Buka file bulanan&lt;/span&gt;&lt;/button&gt;&lt;/div&gt;&lt;/main&gt;
 
 &lt;main id="typeGate" class="page"&gt;
   &lt;div class="type-intro"&gt;
@@ -18249,8 +18161,8 @@ body&gt;.app .sup,body&gt;.app .date{color:#7d8692!important;}
 &lt;option value="TIDAK"&gt;TIDAK&lt;/option&gt;
 &lt;/select&gt;&lt;/div&gt;&lt;div class="field"&gt;&lt;label&gt;TINDAKAN KOREKSI&lt;/label&gt;&lt;select id="corr" onchange="document.getElementById('manual').style.display=this.value==='MANUAL'?'block':'none'"&gt;&lt;option value=""&gt;Tidak ada / pilih&lt;/option&gt;&lt;option&gt;PAKAI STEREFOAM + ES&lt;/option&gt;&lt;option value="MANUAL"&gt;LAINNYA / KETIK SENDIRI&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;&lt;div class="field" id="manual" style="display:none"&gt;&lt;label&gt;KETERANGAN TINDAKAN KOREKSI&lt;/label&gt;&lt;textarea id="corrText" placeholder="Tulis tindakan koreksi..."&gt;&lt;/textarea&gt;&lt;/div&gt;&lt;div class="row"&gt;&lt;div class="field"&gt;&lt;label&gt;KEPUTUSAN&lt;/label&gt;&lt;select id="decision"&gt;&lt;option value=""&gt;Pilih&lt;/option&gt;&lt;option&gt;DITERIMA&lt;/option&gt;&lt;option&gt;DITOLAK&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;&lt;div class="field"&gt;&lt;label&gt;PIC&lt;/label&gt;&lt;select id="pic" onchange="toggleOtherPic()"&gt;&lt;option value=""&gt;Pilih PIC
   &lt;/option&gt;&lt;option&gt;MAMAD
-  &lt;/option&gt;&lt;option&gt;ISA
   &lt;/option&gt;&lt;option&gt;EFENDI
+  &lt;/option&gt;&lt;option&gt;ISA
   &lt;/option&gt;&lt;option&gt;FARHAN
   &lt;option value="OTHER"&gt;ISI NAMA LAIN
   &lt;/option&gt;&lt;/select&gt;&lt;div id="picOtherWrap" style="display:none"&gt;
@@ -18972,7 +18884,7 @@ async function edit(id){
   document.getElementById('decision').value=x.decision;
   const picSelect=document.getElementById('pic');
   const picOther=document.getElementById('picOther');
-  const picKnown=['MAMAD','ISA','EFENDI','FARHAN'];
+  const picKnown=['MAMAD','EFENDI','ISA','FARHAN'];
   if(picKnown.includes(String(x.pic||'').toUpperCase())){
     picSelect.value=String(x.pic).toUpperCase();
     picOther.value='';
