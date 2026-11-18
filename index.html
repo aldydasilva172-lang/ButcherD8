@@ -14064,13 +14064,87 @@ let pendingTransactionKey = '';
    LOAD MASTER
 ========================================================= */
 
+/* =========================================================
+   MASTER CACHE — LOCAL DEVICE
+========================================================= */
+const ZFOOD_MASTER_CACHE_KEY = 'D8_ZFOOD_MASTER_CACHE_V1';
+const ZFOOD_MASTER_CACHE_TIME_KEY = 'D8_ZFOOD_MASTER_CACHE_TIME_V1';
+
+function buildMasterSearchIndex(data){
+  return (Array.isArray(data) ? data : []).map(function(item){
+    const nama = String(item.nama || '').trim().toLowerCase();
+    return {
+      item: item,
+      artikel: String(item.artikel || '').trim().toLowerCase(),
+      barcode: String(item.barcode || '').trim().toLowerCase(),
+      nama: nama,
+      namaWords: nama ? nama.split(/\s+/) : []
+    };
+  });
+}
+
+function applyMasterData(data, source){
+  if(!Array.isArray(data) || !data.length){
+    throw new Error('Data MASTER kosong atau tidak valid.');
+  }
+
+  MASTER_DATA = data;
+  MASTER_SEARCH_DATA = buildMasterSearchIndex(data);
+  masterLoaded = true;
+  ensureInitialProducts();
+
+  console.info(
+    '[Z-FOOD] MASTER siap:',
+    MASTER_DATA.length,
+    'produk (' + source + ')'
+  );
+}
+
+function readZfoodMasterCache(){
+  try{
+    const raw = localStorage.getItem(ZFOOD_MASTER_CACHE_KEY);
+    if(!raw) return false;
+
+    const data = JSON.parse(raw);
+    if(!Array.isArray(data) || !data.length) return false;
+
+    applyMasterData(data, 'cache lokal');
+    return true;
+  }catch(error){
+    console.warn('[Z-FOOD] Cache MASTER tidak dapat dibaca:', error);
+    return false;
+  }
+}
+
+function saveZfoodMasterCache(data){
+  try{
+    localStorage.setItem(ZFOOD_MASTER_CACHE_KEY, JSON.stringify(data));
+    localStorage.setItem(ZFOOD_MASTER_CACHE_TIME_KEY, String(Date.now()));
+  }catch(error){
+    console.warn('[Z-FOOD] Gagal menyimpan cache MASTER:', error);
+  }
+}
+
+/* =========================================================
+   LOAD MASTER — CACHE FIRST, UPDATE IN BACKGROUND
+========================================================= */
 function loadMaster(){
 
-  masterLoaded = false;
-  MASTER_DATA = [];
-  MASTER_SEARCH_DATA = [];
+  // Cache langsung dipakai agar form tidak perlu menunggu server.
+  // Jika MASTER sudah tersedia di memori, jangan proses cache ulang.
+  let hasLocalData = masterLoaded && MASTER_DATA.length > 0;
+  if(!hasLocalData){
+    hasLocalData = readZfoodMasterCache();
+  }
 
-  setMasterStatus('Sedang mengambil data produk dari MASTER...', 'loading');
+  if(hasLocalData){
+    setMasterStatus('', 'ready');
+  }else{
+    masterLoaded = false;
+    MASTER_DATA = [];
+    MASTER_SEARCH_DATA = [];
+    setMasterStatus('Sedang mengambil data produk dari MASTER...', 'loading');
+  }
 
   const callbackName =
     'zfoodMaster_' + Date.now() + '_' +
@@ -14088,10 +14162,21 @@ function loadMaster(){
     if(script.parentNode) script.parentNode.removeChild(script);
   }
 
+  function handleLoadError(message){
+    if(hasLocalData){
+      // Cache valid: tetap gunakan data lokal jika server sedang offline.
+      masterLoaded = true;
+      setMasterStatus('', 'ready');
+      console.warn('[Z-FOOD] Update MASTER gagal; memakai cache lokal:', message);
+    }else{
+      masterLoaded = false;
+      setMasterStatus(message, 'error');
+    }
+  }
+
   const timeoutId = setTimeout(function(){
     if(finished) return;
-    masterLoaded = false;
-    setMasterStatus('Waktu tunggu habis saat membaca MASTER. Periksa koneksi lalu coba lagi.', 'error');
+    handleLoadError('Waktu tunggu habis saat membaca MASTER. Periksa koneksi lalu coba lagi.');
     finish();
   }, 30000);
 
@@ -14102,44 +14187,23 @@ function loadMaster(){
       if(
         !response ||
         response.success !== true ||
-        !Array.isArray(response.data)
+        !Array.isArray(response.data) ||
+        !response.data.length
       ){
         throw new Error(
           response && response.error
             ? response.error
-            : 'Data MASTER tidak valid.'
+            : 'Data MASTER tidak valid atau kosong.'
         );
       }
 
-      MASTER_DATA = response.data;
-
-      MASTER_SEARCH_DATA = MASTER_DATA.map(function(item){
-        const nama = String(item.nama || '').trim().toLowerCase();
-        return {
-          item: item,
-          artikel: String(item.artikel || '').trim().toLowerCase(),
-          barcode: String(item.barcode || '').trim().toLowerCase(),
-          nama: nama,
-          namaWords: nama ? nama.split(/\s+/) : []
-        };
-      });
-
-      masterLoaded = true;
-      ensureInitialProducts();
-
-      console.info(
-        '[Z-FOOD] MASTER berhasil dimuat:',
-        MASTER_DATA.length,
-        'produk'
-      );
-
-      // Tutup layar loading dan langsung tampilkan halaman Z-FOOD.
+      applyMasterData(response.data, 'server terbaru');
+      saveZfoodMasterCache(response.data);
       setMasterStatus('', 'ready');
 
     }catch(error){
       console.error('[Z-FOOD] Gagal memproses MASTER:', error);
-      masterLoaded = false;
-      setMasterStatus('Gagal memuat MASTER: ' + error.message, 'error');
+      handleLoadError('Gagal memuat MASTER: ' + error.message);
 
     }finally{
       finish();
@@ -14148,8 +14212,7 @@ function loadMaster(){
 
   script.onerror = function(){
     if(finished) return;
-    masterLoaded = false;
-    setMasterStatus('Gagal terhubung ke API MASTER. Periksa koneksi lalu coba lagi.', 'error');
+    handleLoadError('Gagal terhubung ke API MASTER. Periksa koneksi lalu coba lagi.');
     finish();
   };
 
