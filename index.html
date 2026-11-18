@@ -13485,21 +13485,25 @@ input{
     &lt;div class="zcalc-hint" id="zcalcHint"&gt;Nilai awal mengambil total Qty dari bagian seberang. Angka tetap bisa diedit.&lt;/div&gt;
     &lt;input id="zcalcDisplay" class="zcalc-display" type="text" inputmode="decimal" autocomplete="off" value="0"&gt;
     &lt;div class="zcalc-grid"&gt;
+      &lt;button class="zcalc-key op" onclick="zcalcPress('C')"&gt;C&lt;/button&gt;
+      &lt;button class="zcalc-key op" onclick="zcalcPress('DEL')"&gt;⌫&lt;/button&gt;
+      &lt;button class="zcalc-key op" onclick="zcalcPress('%')"&gt;%&lt;/button&gt;
+      &lt;button class="zcalc-key op" onclick="zcalcPress('/')"&gt;÷&lt;/button&gt;
       &lt;button class="zcalc-key" onclick="zcalcPress('7')"&gt;7&lt;/button&gt;
       &lt;button class="zcalc-key" onclick="zcalcPress('8')"&gt;8&lt;/button&gt;
       &lt;button class="zcalc-key" onclick="zcalcPress('9')"&gt;9&lt;/button&gt;
-      &lt;button class="zcalc-key op" onclick="zcalcPress('DEL')"&gt;⌫&lt;/button&gt;
+      &lt;button class="zcalc-key op" onclick="zcalcPress('*')"&gt;×&lt;/button&gt;
       &lt;button class="zcalc-key" onclick="zcalcPress('4')"&gt;4&lt;/button&gt;
       &lt;button class="zcalc-key" onclick="zcalcPress('5')"&gt;5&lt;/button&gt;
       &lt;button class="zcalc-key" onclick="zcalcPress('6')"&gt;6&lt;/button&gt;
-      &lt;button class="zcalc-key op" onclick="zcalcPress('C')"&gt;C&lt;/button&gt;
+      &lt;button class="zcalc-key op" onclick="zcalcPress('-')"&gt;−&lt;/button&gt;
       &lt;button class="zcalc-key" onclick="zcalcPress('1')"&gt;1&lt;/button&gt;
       &lt;button class="zcalc-key" onclick="zcalcPress('2')"&gt;2&lt;/button&gt;
       &lt;button class="zcalc-key" onclick="zcalcPress('3')"&gt;3&lt;/button&gt;
-      &lt;button class="zcalc-key op" onclick="zcalcPress(',')"&gt;,&lt;/button&gt;
+      &lt;button class="zcalc-key op" onclick="zcalcPress('+')"&gt;+&lt;/button&gt;
+      &lt;button class="zcalc-key" onclick="zcalcPress('±')"&gt;±&lt;/button&gt;
       &lt;button class="zcalc-key" onclick="zcalcPress('0')"&gt;0&lt;/button&gt;
-      &lt;button class="zcalc-key" onclick="zcalcPress('00')"&gt;00&lt;/button&gt;
-      &lt;button class="zcalc-key" onclick="zcalcPress('-')"&gt;±&lt;/button&gt;
+      &lt;button class="zcalc-key" onclick="zcalcPress(',')"&gt;,&lt;/button&gt;
       &lt;button class="zcalc-key eq" onclick="zcalcPress('=')"&gt;=&lt;/button&gt;
     &lt;/div&gt;
     &lt;div class="zcalc-actions"&gt;
@@ -13619,6 +13623,9 @@ function openZfoodCalculator(button){
   const title=document.getElementById('zcalcTitle');
   const hint=document.getElementById('zcalcHint');
 
+  zcalcStoredValue=null;
+  zcalcPendingOperator=null;
+  zcalcWaitingForValue=false;
   if(display)display.value=current||zfoodFormatCalc(crossTotal);
   if(title)title.textContent='KALKULATOR • PRODUK '+(type==='awal'?'AWAL':'AKHIR');
   if(hint)hint.textContent='Total Qty '+(opposite==='awal'?'Produk Awal':'Produk Akhir')+': '+zfoodFormatCalc(crossTotal)+' • Nilai bisa diedit manual.';
@@ -13640,23 +13647,111 @@ function restoreZfoodCalculator(){
   document.getElementById('zfoodCalculatorModal').classList.add('on');
   document.getElementById('zfoodCalculatorModal').setAttribute('aria-hidden','false');
 }
+let zcalcStoredValue=null;
+let zcalcPendingOperator=null;
+let zcalcWaitingForValue=false;
+
+function zcalcCalculate(a,b,operator){
+  if(operator==='+')return a+b;
+  if(operator==='-')return a-b;
+  if(operator==='*')return a*b;
+  if(operator==='/')return b===0?NaN:a/b;
+  return b;
+}
+
 function zcalcPress(key){
   const display=document.getElementById('zcalcDisplay');
   if(!display)return;
-  let value=display.value||'0';
-  if(key==='C'){display.value='0';return;}
-  if(key==='DEL'){display.value=value.length>1?value.slice(0,-1):'0';return;}
-  if(key==='='){display.value=zfoodFormatCalc(zfoodNumber(value));return;}
-  if(key==='-'){
+
+  let value=String(display.value||'0');
+  let number=zfoodNumber(value);
+
+  if(key==='C'){
+    display.value='0';
+    zcalcStoredValue=null;
+    zcalcPendingOperator=null;
+    zcalcWaitingForValue=false;
+    return;
+  }
+
+  if(key==='DEL'){
+    if(zcalcWaitingForValue){display.value='0';zcalcWaitingForValue=false;return;}
+    display.value=value.length>1?value.slice(0,-1):'0';
+    if(display.value==='-'||display.value==='')display.value='0';
+    return;
+  }
+
+  if(key==='±'){
     display.value=value.startsWith('-')?value.slice(1):'-'+value;
     return;
   }
-  if(key===','){
-    if(!value.includes(','))display.value=value+',';
+
+  if(key==='%'){
+    display.value=zfoodFormatCalc(number/100);
+    zcalcWaitingForValue=false;
     return;
   }
+
+  if(['+','-','*','/'].includes(key)){
+    if(zcalcPendingOperator && !zcalcWaitingForValue){
+      const result=zcalcCalculate(
+        Number(zcalcStoredValue),
+        number,
+        zcalcPendingOperator
+      );
+      if(!Number.isFinite(result)){
+        display.value='Error';
+        zcalcStoredValue=null;
+        zcalcPendingOperator=null;
+        zcalcWaitingForValue=true;
+        return;
+      }
+      display.value=zfoodFormatCalc(result);
+      zcalcStoredValue=result;
+    }else{
+      zcalcStoredValue=number;
+    }
+    zcalcPendingOperator=key;
+    zcalcWaitingForValue=true;
+    return;
+  }
+
+  if(key==='='){
+    if(zcalcPendingOperator && zcalcStoredValue!==null){
+      const result=zcalcCalculate(
+        Number(zcalcStoredValue),
+        number,
+        zcalcPendingOperator
+      );
+      display.value=Number.isFinite(result)?zfoodFormatCalc(result):'Error';
+      zcalcStoredValue=null;
+      zcalcPendingOperator=null;
+      zcalcWaitingForValue=true;
+    }else{
+      display.value=zfoodFormatCalc(number);
+    }
+    return;
+  }
+
+  if(key===','){
+    if(zcalcWaitingForValue){
+      display.value='0,';
+      zcalcWaitingForValue=false;
+    }else if(!value.includes(',')){
+      display.value=value+',';
+    }
+    return;
+  }
+
+  if(zcalcWaitingForValue){
+    display.value=key;
+    zcalcWaitingForValue=false;
+    return;
+  }
+
   display.value=value==='0'?key:value+key;
 }
+
 function applyZfoodCalculator(){
   const display=document.getElementById('zcalcDisplay');
   if(!zfoodCalcTarget||!display)return;
