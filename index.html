@@ -6632,6 +6632,35 @@ body
   transform:translateY(-50%) scale(.94);
 }
 </style>
+<style>
+/* ---------- DASHBOARD MEDIA LANDSCAPE ---------- */
+#dashboard .dashboard-media-wrap{
+  width:100%;
+  max-width:900px;
+  margin-top:16px;
+}
+#dashboard .dashboard-media{
+  position:relative;
+  width:100%;
+  aspect-ratio:16 / 9;
+  overflow:hidden;
+  border-radius:15px;
+  background:#e9edf2;
+  border:1px solid #e5e8eb;
+  box-shadow:0 7px 22px rgba(15,23,42,.06);
+}
+#dashboard .dashboard-media img,
+#dashboard .dashboard-media video{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+@media(max-width:800px){
+  #dashboard .dashboard-media-wrap{margin-top:10px;}
+  #dashboard .dashboard-media{border-radius:11px;}
+}
+</style>
 </head>
 <body>
 <section id="loginPage">
@@ -6766,6 +6795,15 @@ body
 <p>Sistem siap digunakan dan terhubung.</p>
 </div>
 </div>
+</div>
+<!-- MEDIA DASHBOARD: ganti nama file pada src setelah foto/video diupload -->
+<div class="dashboard-media-wrap">
+  <div class="dashboard-media">
+    <img src="0626F8F9-9BCC-47D7-BC26-1A518A6D8828.png" alt="Dashboard media" loading="lazy">
+    <!-- Untuk video, ganti tag img di atas dengan:
+    <video src="0626F8F9-9BCC-47D7-BC26-1A518A6D8828.png" autoplay muted loop playsinline controls></video>
+    -->
+  </div>
 </div>
 <div class="dashboard-footer">
 <span>CREATED BY • <span style="color: #1976D2;">ALDI PRAYOGA</span>
